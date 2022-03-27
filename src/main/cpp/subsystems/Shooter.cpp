@@ -62,6 +62,7 @@ void Shooter::Periodic()
 void Shooter::OutputData()
 {
     frc::SmartDashboard::PutNumber("Shooter/Velocity", GetShooterVelocity());
+    frc::SmartDashboard::PutNumber("Shooter/Velocity", m_ShooterMotor.GetClosedLoopError());
     frc::SmartDashboard::PutNumber("Shooter/RPM", (m_ShooterMotor.GetSelectedSensorVelocity(0) * 600) / ShooterConstants::kCountsPerRev);
     frc::SmartDashboard::PutNumber("Shooter/Target Velocity", m_targetVelocity);
     // frc::SmartDashboard::PutNumber("Hood/m_HoodMotorSensorPos", m_HoodMotor.GetSelectedSensorPosition(0));
@@ -99,7 +100,7 @@ void Shooter::SetShooterVelocity(double velocity)
 
 bool Shooter::IsInTargetVel()
 {
-    return (std::abs(GetTargetVelocity() - GetShooterVelocity()) <= 30);
+    return (std::abs(GetTargetVelocity() - GetShooterVelocity()) <= 50);
 }
 
 double Shooter::GetTargetVelocity()

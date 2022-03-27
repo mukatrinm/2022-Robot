@@ -37,7 +37,7 @@ void RobotContainer::ConfigureButtonBindings()
     frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kY))
         .WhenHeld(frc2::SequentialCommandGroup{
             frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(12290); }, {&m_shooter}),
-            frc2::WaitUntilCommand([this] { return m_shooter.IsInTargetVel(); }).WithTimeout(2.5_s),
+            frc2::WaitUntilCommand([this] { return m_shooter.IsInTargetVel(); }).WithTimeout(1_s),
             frc2::InstantCommand([this] { m_indexer.FeedCargo(); }, {&m_indexer})})
         .WhenReleased(frc2::SequentialCommandGroup{
             frc2::InstantCommand{[this] { m_shooter.StopShooter(); }},

@@ -47,9 +47,9 @@ namespace ShooterConstants {
     constexpr int kTimeoutMs = 30;
     constexpr int kPIDLoopIdx = 0;
     constexpr double kShooterF = 0.05719310822 ;
-    constexpr double kShooterP = 0.15;//0.4447826087; //0.1217857143;
-    constexpr double kShooterI = 0.000;
-    constexpr double kShooterD = 0.0;//kShooterP*10;
+    constexpr double kShooterP = 0.14594;//0.4447826087; //0.1217857143;
+    constexpr double kShooterI = 0.00001;
+    constexpr double kShooterD = 1.4594;//kShooterP*10;
 }
 
 namespace ClimberConstants {

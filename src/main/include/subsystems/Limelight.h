@@ -42,7 +42,7 @@ private:
 
     double m_CurrentAngle = 0.0;
     double target_angle = 0.0;
-    double h = 1.4; // TODO: change to correct height
+    double h = 0.94; // TODO: change to correct height
     double theta = 35;
     volatile VisionState m_state{0, 0, 0};
     bool m_targetFound = false;

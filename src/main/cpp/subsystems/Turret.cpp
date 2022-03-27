@@ -6,9 +6,9 @@ Turret::Turret(DriveTrain *driveTrain, Limelight *limelight) : m_driveTrain{driv
                                                                m_limelight{limelight},
                                                                m_turretMotor{TurretConstants::kTurret}
 {
+    m_turretMotor.SetInverted(true);
     m_turretMotor.SetSensorPhase(false);
-    m_turretMotor.SetInverted(false);
-
+    
     m_turretMotor.SetNeutralMode(NeutralMode::Brake);
 
     InitClosedLoop();
@@ -33,7 +33,7 @@ void Turret::Periodic()
     double turrVel = m_turretMotor.GetSelectedSensorVelocity();
     if (maxVel < std::abs(turrVel)) {
         maxVel = std::abs(turrVel);
-        frc::SmartDashboard::PutNumber("Turret/Max Velocity", maxVel);
+        frc::SmartDashboard::PutNumber("Turret/Max Velocity-2", maxVel);
     }
 
     m_currentAngle = m_turretMotor.GetSelectedSensorPosition() / TurretConstants::kTicksPerAngle;
@@ -56,15 +56,29 @@ double Turret::GetTargetAngle()
     return m_target;
 }
 
+bool Turret::IsInTargetAngle()
+{
+    return (std::abs(m_target - m_currentAngle) <= 15);
+}
+
 void Turret::FeedTalons()
 {
     m_turretMotor.Feed();
 }
 
+void Turret::EnableBrakeMode()
+{
+    m_turretMotor.SetNeutralMode(NeutralMode::Brake);
+}
+
+void Turret::EnableCoastMode()
+{
+    m_turretMotor.SetNeutralMode(NeutralMode::Coast);
+}
+
 void Turret::InitClosedLoop()
 {
     m_turretMotor.ConfigFactoryDefault();
-    m_turretMotor.ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Relative, TurretConstants::kPIDLoopIdx, TurretConstants::kTimeoutMs);
 
     m_turretMotor.SetStatusFramePeriod(StatusFrameEnhanced::Status_13_Base_PIDF0, 10, TurretConstants::kTimeoutMs);
     m_turretMotor.SetStatusFramePeriod(StatusFrameEnhanced::Status_10_MotionMagic, 10, TurretConstants::kTimeoutMs);
@@ -139,10 +153,10 @@ void Turret::StopTurret()
 
 void Turret::OutputToDashboard()
 {
-    frc::SmartDashboard::PutNumber("Turret/TurretSensorVel", m_turretMotor.GetSelectedSensorVelocity(0));
-    frc::SmartDashboard::PutNumber("Turret/TurretSensorPos", m_turretMotor.GetSelectedSensorPosition(0));
+    frc::SmartDashboard::PutNumber("Turret/TurretSensorVel-2", m_turretMotor.GetSelectedSensorVelocity());
+    frc::SmartDashboard::PutNumber("Turret/TurretSensorPos-2", m_turretMotor.GetSelectedSensorPosition());
     // frc::SmartDashboard::PutNumber("Turret MotorOutputPercent", m_turretMotor.GetMotorOutputPercent());
-    // frc::SmartDashboard::PutNumber("Turret/ClosedLoopError", m_turretMotor.GetClosedLoopError(0));
+    frc::SmartDashboard::PutNumber("Turret/ClosedLoopError", m_turretMotor.GetClosedLoopError());
 
     // frc::SmartDashboard::PutNumber("Turret ClosedLoopTarget",  m_turretMotor.GetClosedLoopTarget(0));
     // frc::SmartDashboard::PutNumber("Turret ActTrajVelocity",  m_turretMotor.GetActiveTrajectoryVelocity());

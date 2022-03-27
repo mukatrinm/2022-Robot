@@ -60,21 +60,21 @@ namespace ClimberConstants {
 
 namespace TurretConstants {
     constexpr int kTurret = 11;
-    constexpr double kTurretSpeed = 0.3;
-    constexpr double kMaxSensorVelocity = 8000;
-    constexpr double kMaxSensorAcceleration = 11000;
+    constexpr double kTurretSpeed = 1.0;
+    constexpr double kMaxSensorVelocity = 22000;
+    constexpr double kMaxSensorAcceleration = 20000;
 
-    constexpr double kPTurret = 0.01229604255*128;
+    constexpr double kPTurret = 0.444;
     constexpr double kITurret = 0.002;
-    constexpr double kDTurret = kPTurret*10;
-    constexpr double kFTurret = 0.12148125;
+    constexpr double kDTurret = 4.44;
+    constexpr double kFTurret = 0.0465;
 
-    constexpr double kTicksPerAngle = 33279/360.0;
+    constexpr double kTicksPerAngle = (602716)/360.0;
     constexpr int kSlotIdx = 0;
     constexpr int kPIDLoopIdx = 0;
     constexpr int kTimeoutMs = 10;
 
-    constexpr int kTicksPerRev = 4096;
+    constexpr int kTicksPerRev = 2048;
     constexpr int kSmoothing = 4;
 
     constexpr double kAcceptableStartRange = 0;

@@ -36,7 +36,19 @@ void RobotContainer::ConfigureButtonBindings()
 {
     frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kY))
         .WhenHeld(frc2::SequentialCommandGroup{
-            frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(12290); }, {&m_shooter}),
+            frc2::InstantCommand{[this] { m_turret.TurnToAngleNotConstraint(-m_limelight.GetTargetAngle()); }, {&m_turret}},
+            frc2::WaitUntilCommand([this] { return m_turret.IsInTargetAngle(); }).WithTimeout(1_s),
+            frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(12300); }, {&m_shooter}),
+            // frc2::WaitUntilCommand([this] { return m_shooter.IsInTargetVel(); }).WithTimeout(1_s),
+            frc2::WaitCommand(2_s),
+            frc2::InstantCommand([this] { m_indexer.FeedCargo(); }, {&m_indexer})})
+        .WhenReleased(frc2::SequentialCommandGroup{
+            frc2::InstantCommand{[this] { m_shooter.StopShooter(); }},
+            frc2::InstantCommand{[this] { m_indexer.Stop(); }}});
+
+    frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kA))
+        .WhenHeld(frc2::SequentialCommandGroup{
+            frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(10290); }, {&m_shooter}),
             frc2::WaitUntilCommand([this] { return m_shooter.IsInTargetVel(); }).WithTimeout(1_s),
             frc2::InstantCommand([this] { m_indexer.FeedCargo(); }, {&m_indexer})})
         .WhenReleased(frc2::SequentialCommandGroup{
@@ -50,8 +62,10 @@ void RobotContainer::ConfigureButtonBindings()
         .WhenPressed(&m_StopIntake);
 
     frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kRightBumper))
-        .WhenPressed(&m_runTurretCW)
-        .WhenReleased(&m_StopTurret);
+        .WhenPressed(frc2::InstantCommand{[this] { m_turret.TurnToAngleNotConstraint(-m_limelight.GetTargetAngle()); },
+                                          {&m_turret}});
+    // .WhenReleased(frc2::InstantCommand{[this] { m_turret.StopTurret(); },
+    //                                    {&m_turret}});
 
     frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kLeftBumper))
         .WhenPressed(&m_runTurretCCW)
@@ -85,4 +99,34 @@ frc2::Command *RobotContainer::GetAutonomousCommand()
     // An example command will be run in autonomous
     // return nullptr;
     return &Auto;
+}
+
+RobotContainer *RobotContainer::getInstance()
+{
+    static RobotContainer Instance;
+    return &Instance;
+}
+
+DriveTrain *RobotContainer::GetDriveTrain()
+{
+    return &m_Drive;
+}
+
+Shooter *RobotContainer::GetShooter()
+{
+    return &m_shooter;
+}
+
+Indexer *RobotContainer::GetIndexer()
+{
+    return &m_indexer;
+}
+
+Intake *RobotContainer::GetIntake()
+{
+    return &m_intake;
+}
+Turret *RobotContainer::GetTurret()
+{
+    return &m_turret;
 }

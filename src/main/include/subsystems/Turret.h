@@ -23,11 +23,14 @@ public:
     void OutputToDashboard();
     double GetTargetAngle();
     bool InSafeZone();
+    void EnableCoastMode();
+    void EnableBrakeMode();
+    bool IsInTargetAngle();
 
 private:
     DriveTrain *m_driveTrain;
     Limelight *m_limelight;
-    WPI_TalonSRX m_turretMotor;
+    WPI_TalonFX m_turretMotor;
     double m_target;
     void OutputData();
     double ConstrainToAcceptableRange(double angle);

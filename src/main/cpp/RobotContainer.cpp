@@ -22,6 +22,18 @@ RobotContainer::RobotContainer()
 
     // Configure the button bindings
     ConfigureButtonBindings();
+    // m_Drive.SetDefaultCommand(frc2::RunCommand(
+    //     [this] {
+    //         m_Drive.DRCDrive(
+    //             1.0 * m_MainJoystick.GetRawAxis(frc::XboxController::Axis::kRightTrigger),
+    //             1.0 * m_MainJoystick.GetRawAxis(frc::XboxController::Axis::kLeftTrigger),
+    //             0.9 * m_MainJoystick.GetLeftX());
+    //     },
+    //     {&m_Drive}));
+}
+
+void RobotContainer::EnableDTDefaultCommand()
+{
     m_Drive.SetDefaultCommand(frc2::RunCommand(
         [this] {
             m_Drive.DRCDrive(
@@ -37,10 +49,11 @@ void RobotContainer::ConfigureButtonBindings()
     frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kY))
         .WhenHeld(frc2::SequentialCommandGroup{
             frc2::InstantCommand{[this] { m_turret.TurnToAngleNotConstraint(-m_limelight.GetTargetAngle()); }, {&m_turret}},
-            frc2::WaitUntilCommand([this] { return m_turret.IsInTargetAngle(); }).WithTimeout(1_s),
+            // frc2::WaitUntilCommand([this] { return m_turret.IsInTargetAngle(); }).WithTimeout(1_s),
+            frc2::WaitCommand(0.5_s),
             frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(12300); }, {&m_shooter}),
             // frc2::WaitUntilCommand([this] { return m_shooter.IsInTargetVel(); }).WithTimeout(1_s),
-            frc2::WaitCommand(2_s),
+            frc2::WaitCommand(2.0_s),
             frc2::InstantCommand([this] { m_indexer.FeedCargo(); }, {&m_indexer})})
         .WhenReleased(frc2::SequentialCommandGroup{
             frc2::InstantCommand{[this] { m_shooter.StopShooter(); }},
@@ -49,7 +62,8 @@ void RobotContainer::ConfigureButtonBindings()
     frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kA))
         .WhenHeld(frc2::SequentialCommandGroup{
             frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(10290); }, {&m_shooter}),
-            frc2::WaitUntilCommand([this] { return m_shooter.IsInTargetVel(); }).WithTimeout(1_s),
+            // frc2::WaitUntilCommand([this] { return m_shooter.IsInTargetVel(); }).WithTimeout(1_s),
+            frc2::WaitCommand(0.5_s),
             frc2::InstantCommand([this] { m_indexer.FeedCargo(); }, {&m_indexer})})
         .WhenReleased(frc2::SequentialCommandGroup{
             frc2::InstantCommand{[this] { m_shooter.StopShooter(); }},
@@ -68,8 +82,10 @@ void RobotContainer::ConfigureButtonBindings()
     //                                    {&m_turret}});
 
     frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kLeftBumper))
-        .WhenPressed(&m_runTurretCCW)
-        .WhenReleased(&m_StopTurret);
+        .WhenPressed(frc2::InstantCommand{[this] { m_Drive.MoveSrtaight(0.47877); },
+                                          {&m_Drive}});
+        // .WhenReleased(frc2::InstantCommand{[this] { m_Drive.DRCDrive(0.0, 0.0, 0.0); },
+        //                                   {&m_Drive}});
 
     frc2::POVButton(&m_MainJoystick, 0)
         .WhenPressed(&m_RunClimberUp)

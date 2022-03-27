@@ -53,15 +53,31 @@ public:
         frc2::InstantCommand{[this] { m_indexer.Stop(); }}};
 
     frc2::SequentialCommandGroup Auto{
-        frc2::InstantCommand{[this] { m_shooter.RunShooter(0.68); }},
-        frc2::WaitCommand(1_s),
-        frc2::InstantCommand{[this] { m_indexer.FeedCargo(); }},
-        frc2::WaitCommand(5_s),
+        frc2::InstantCommand{[this] { m_intake.IntakeDown(); }, {&m_intake}},
+        frc2::InstantCommand{[this] { m_intake.RunIntake(); }, {&m_intake}},
+        frc2::InstantCommand{[this] { m_indexer.RunIndexer(); }, {&m_intake}},
+        frc2::InstantCommand{[this] { m_turret.TurnToAngleNotConstraint(-90); }, {&m_turret}},
+        frc2::WaitCommand(0.2_s),
+        frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(9290); }, {&m_shooter}),
+        frc2::WaitCommand(1.5_s),
+        frc2::InstantCommand{[this] { m_indexer.FeedCargo(); }, {&m_indexer}},
+        frc2::WaitCommand(2_s),
+        frc2::InstantCommand{[this] { m_indexer.Stop(); }, {&m_indexer}},
+        frc2::InstantCommand{[this] { m_Drive.MoveSrtaight(1); }, {&m_Drive}},
+        frc2::WaitCommand(1.5_s),
+        frc2::InstantCommand{[this] { m_Drive.DRCDrive(0.0, 0.0, 0.0); }, {&m_Drive}},
+        frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(12230); }, {&m_shooter}),
+        frc2::WaitCommand(0.5_s),
+        frc2::InstantCommand{[this] { m_indexer.FeedCargo(); }, {&m_indexer}},
+        frc2::WaitCommand(2.5_s),
         frc2::InstantCommand{[this] { m_shooter.StopShooter(); }},
         frc2::InstantCommand{[this] { m_indexer.Stop(); }},
-        frc2::InstantCommand{[this] { m_Drive.DRCDrive(0, 0.7, 0); }, {&m_Drive}},
-        frc2::WaitCommand(2_s),
-        frc2::InstantCommand{[this] { m_Drive.DRCDrive(0, 0.0, 0); }, {&m_Drive}}};
+    };
+
+    // frc2::SequentialCommandGroup Auto{
+    //   // frc2::InstantCommand{[this] { m_shooter.RunShooter(0.28); }},
+    //     frc2::InstantCommand{[this] { m_Drive.MoveSrtaight(1);}, {&m_Drive}}
+    // };
 
     frc2::InstantCommand m_RunClimberUp{[this] { m_climber.RunClimberUp(); }, {}};
     frc2::InstantCommand m_RunClimberDown{[this] { m_climber.RunClimberDown(); }, {}};
@@ -82,7 +98,7 @@ public:
     frc2::InstantCommand m_StopTurret{[this] { m_turret.StopTurret(); },
                                       {&m_turret}};
 
-    frc2::InstantCommand m_switch2Breakmode{[this] { m_Drive.TurnOnBreakMode(); },
+    frc2::InstantCommand m_switch2Breakmode{[this] { m_Drive.TurnOnBrakeMode(); },
                                             {}};
 
     frc2::InstantCommand m_switch2Coastmode{[this] { m_Drive.TurnOnCoastMode(); },
@@ -97,6 +113,8 @@ public:
     Indexer *GetIndexer();
     Intake *GetIntake();
     Turret *GetTurret();
+
+    void EnableDTDefaultCommand();
 
 private:
     void ConfigureButtonBindings();

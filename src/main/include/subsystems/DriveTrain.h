@@ -29,7 +29,7 @@ public:
      */
     void DRCDrive(double RT, double LT, double rot);
     void TurnOnCoastMode();
-    void TurnOnBreakMode();
+    void TurnOnBrakeMode();
 
     /**
      * Will be called periodically whenever the CommandScheduler runs.
@@ -48,6 +48,7 @@ public:
 
     double SetMaxOutput();
     void FeedTalons();
+    void ResetEncoders();
 
 private:
     WPI_TalonFX m_RightMotorMain;
@@ -65,6 +66,7 @@ private:
     nt::NetworkTableEntry m_xEntry;
     nt::NetworkTableEntry m_yEntry;
 
+    void OutputData();
     // nt::NetworkTableEntry leftRef;// = table->GetEntry("left_reference");
     // nt::NetworkTableEntry leftMeas;// = table -> GetEntry("left_measurement");
     // nt::NetworkTableEntry rightRef;// = table -> GetEntry("right_reference");

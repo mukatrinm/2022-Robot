@@ -24,6 +24,11 @@ DriveTrain::DriveTrain()
     //   rightMeas{nt::NetworkTableInstance::GetDefault().GetTable("troubleshooting")->GetEntry("right_measurement")}
 
 {   
+    m_RightMotorMain.ConfigFactoryDefault();
+    m_RightMotorFollower.ConfigFactoryDefault();
+    m_LeftMotorMain.ConfigFactoryDefault();
+    m_LeftMotorFollower.ConfigFactoryDefault();
+
     m_RightMotorMain.SetNeutralMode(NeutralMode::Brake);
     m_RightMotorFollower.SetNeutralMode(NeutralMode::Brake);
     m_LeftMotorMain.SetNeutralMode(NeutralMode::Brake);
@@ -41,9 +46,42 @@ DriveTrain::DriveTrain()
     m_RightMotorFollower.SetInverted(true);
     m_LeftMotorMain.SetInverted(false);
     m_LeftMotorFollower.SetInverted(false);
+
+    ResetEncoders();
+
+    m_RightMotorMain.SelectProfileSlot(DriveTrainContsants::kSlotIdx, DriveTrainContsants::kPIDLoopIdx);
+    m_RightMotorMain.Config_kF(DriveTrainContsants::kSlotIdx, DriveTrainContsants::kDriveF, DriveTrainContsants::kTimeoutMs);
+    m_RightMotorMain.Config_kP(DriveTrainContsants::kSlotIdx, DriveTrainContsants::kDriveP, DriveTrainContsants::kTimeoutMs);
+    m_RightMotorMain.Config_kI(DriveTrainContsants::kSlotIdx, DriveTrainContsants::kDriveI, DriveTrainContsants::kTimeoutMs);
+    m_RightMotorMain.Config_kD(DriveTrainContsants::kSlotIdx, DriveTrainContsants::kDriveD, DriveTrainContsants::kTimeoutMs);
+
+    m_RightMotorMain.ConfigMotionCruiseVelocity(DriveTrainContsants::kDriveMaxSensorVelocity, DriveTrainContsants::kTimeoutMs);
+    m_RightMotorMain.ConfigMotionAcceleration(DriveTrainContsants::kDriveMaxSensorAcceleration, DriveTrainContsants::kTimeoutMs);
+
+    m_LeftMotorMain.SelectProfileSlot(DriveTrainContsants::kSlotIdx, DriveTrainContsants::kPIDLoopIdx);
+    m_LeftMotorMain.Config_kF(DriveTrainContsants::kSlotIdx, DriveTrainContsants::kDriveF, DriveTrainContsants::kTimeoutMs);
+    m_LeftMotorMain.Config_kP(DriveTrainContsants::kSlotIdx, DriveTrainContsants::kDriveP, DriveTrainContsants::kTimeoutMs);
+    m_LeftMotorMain.Config_kI(DriveTrainContsants::kSlotIdx, DriveTrainContsants::kDriveI, DriveTrainContsants::kTimeoutMs);
+    m_LeftMotorMain.Config_kD(DriveTrainContsants::kSlotIdx, DriveTrainContsants::kDriveD, DriveTrainContsants::kTimeoutMs);
+
+    m_LeftMotorMain.ConfigMotionCruiseVelocity(DriveTrainContsants::kDriveMaxSensorVelocity, DriveTrainContsants::kTimeoutMs);
+    m_LeftMotorMain.ConfigMotionAcceleration(DriveTrainContsants::kDriveMaxSensorAcceleration, DriveTrainContsants::kTimeoutMs);
+
 }
 
-void DriveTrain::TurnOnBreakMode()
+void DriveTrain::ResetEncoders()
+{
+    m_RightMotorMain.SetSelectedSensorPosition(0);
+    m_LeftMotorMain.SetSelectedSensorPosition(0);
+}
+
+void DriveTrain::MoveSrtaight(double distance) {    
+    ResetEncoders();
+    m_LeftMotorMain.Set(ControlMode::MotionMagic, distance / kDriveDistPerTick);
+    m_RightMotorMain.Set(ControlMode::MotionMagic, distance / kDriveDistPerTick);
+}
+
+void DriveTrain::TurnOnBrakeMode()
 {
     m_RightMotorMain.SetNeutralMode(NeutralMode::Brake);
     m_RightMotorFollower.SetNeutralMode(NeutralMode::Brake);
@@ -62,7 +100,27 @@ void DriveTrain::TurnOnCoastMode()
 void DriveTrain::Periodic()
 {
     FeedTalons();
+    OutputData();
 
+    //calc max velocity
+    // double hoodVel = m_LeftMotorMain.GetSelectedSensorVelocity();
+    // static double maxVel = 0.0;
+    // if (maxVel < std::abs(hoodVel))
+    // {
+    //     maxVel = std::abs(hoodVel);
+    //     frc::SmartDashboard::PutNumber("DT/Max Left Velocity", maxVel);
+    // }  
+}
+
+void DriveTrain::OutputData()
+{
+    frc::SmartDashboard::PutNumber("DT/RightPosition", m_RightMotorMain.GetSelectedSensorPosition());
+    frc::SmartDashboard::PutNumber("DT/RightVelocity", m_RightMotorMain.GetSelectedSensorVelocity());
+    frc::SmartDashboard::PutNumber("DT/Right error", m_RightMotorMain.GetClosedLoopError());
+
+    frc::SmartDashboard::PutNumber("DT/LeftPosition", m_LeftMotorMain.GetSelectedSensorPosition());
+    frc::SmartDashboard::PutNumber("DT/LeftVelocity", m_LeftMotorMain.GetSelectedSensorVelocity());
+    frc::SmartDashboard::PutNumber("DT/Left error", m_LeftMotorMain.GetClosedLoopError());
 }
 
 void DriveTrain::ArcadeDrive(double fwd)

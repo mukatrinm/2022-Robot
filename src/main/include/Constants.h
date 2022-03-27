@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include "wpi/numbers"
+#include "units/math.h"
+
 namespace OI {
     constexpr int kMainController = 0;
     constexpr int kSecondaryController = 1;
@@ -21,6 +24,26 @@ namespace DriveTrainContsants {
     constexpr int kGearSwitcher1 = 5;
 
     constexpr bool kGyroReversed = true;
+
+    constexpr double kLeftEncoderCPR = 2048.0;
+    constexpr double kRightEncoderCPR = 2048.0;
+
+    constexpr double kWheelCircumference = 0.1524 * wpi::numbers::pi;
+
+    constexpr double kDriveGearing = 14.98; // TODO: check this value, and make another value for low gear
+    constexpr double kDriveDistPerTick = (3 * kWheelCircumference) / 79000.0;//kWheelCircumference / kLeftEncoderCPR / kDriveGearing; // meters per encoder tick
+
+    // motion magic constants
+    constexpr int kSlotIdx = 0;
+    constexpr int kTimeoutMs = 30;
+    constexpr int kPIDLoopIdx = 0;
+    constexpr double kDriveF = 0.04513235294;
+    constexpr double kDriveP = 0.04204685573*8; //0.1217857143;
+    constexpr double kDriveI = 0.00001;
+    constexpr double kDriveD = kDriveP*10;
+    constexpr double kDriveMaxSensorVelocity = 17000;
+    constexpr double kDriveMaxSensorAcceleration =12000;
+
 }
 
 

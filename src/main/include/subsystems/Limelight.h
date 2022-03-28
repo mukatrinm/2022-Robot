@@ -13,6 +13,7 @@ public:
     void Periodic() override;
     // VisionState GetState();
     bool HasTarget();
+    bool IsInRange();
     void TurnOffLEDs();
     void TurnOnLEDs();
     double GetTargetAngle();

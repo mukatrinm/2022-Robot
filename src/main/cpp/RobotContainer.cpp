@@ -17,6 +17,7 @@
 #include <frc2/command/RunCommand.h>
 
 RobotContainer::RobotContainer()
+    : shooter_speed{12330}
 {
     // Initialize all of your commands and subsystems here
 
@@ -30,6 +31,7 @@ RobotContainer::RobotContainer()
     //             0.9 * m_MainJoystick.GetLeftX());
     //     },
     //     {&m_Drive}));
+    frc::SmartDashboard::PutNumber("Shooter/Input Velocity", shooter_speed);
 }
 
 void RobotContainer::EnableDTDefaultCommand()
@@ -51,7 +53,7 @@ void RobotContainer::ConfigureButtonBindings()
             frc2::InstantCommand{[this] { m_turret.TurnToAngleNotConstraint(-m_limelight.GetTargetAngle()); }, {&m_turret}},
             // frc2::WaitUntilCommand([this] { return m_turret.IsInTargetAngle(); }).WithTimeout(1_s),
             frc2::WaitCommand(0.5_s),
-            frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(12300); }, {&m_shooter}),
+            frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(13550); }, {&m_shooter}),
             // frc2::WaitUntilCommand([this] { return m_shooter.IsInTargetVel(); }).WithTimeout(1_s),
             frc2::WaitCommand(2.0_s),
             frc2::InstantCommand([this] { m_indexer.FeedCargo(); }, {&m_indexer})})
@@ -76,16 +78,16 @@ void RobotContainer::ConfigureButtonBindings()
         .WhenPressed(&m_StopIntake);
 
     frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kRightBumper))
-        .WhenPressed(frc2::InstantCommand{[this] { m_turret.TurnToAngleNotConstraint(-m_limelight.GetTargetAngle()); },
-                                          {&m_turret}});
-    // .WhenReleased(frc2::InstantCommand{[this] { m_turret.StopTurret(); },
-    //                                    {&m_turret}});
+        .WhenPressed(frc2::InstantCommand{[this] { m_turret.RunTurretCW(); },
+                                          {&m_turret}})
+        .WhenReleased(frc2::InstantCommand{[this] { m_turret.StopTurret(); },
+                                           {&m_turret}});
 
     frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kLeftBumper))
-        .WhenPressed(frc2::InstantCommand{[this] { m_Drive.MoveSrtaight(0.47877); },
-                                          {&m_Drive}});
-        // .WhenReleased(frc2::InstantCommand{[this] { m_Drive.DRCDrive(0.0, 0.0, 0.0); },
-        //                                   {&m_Drive}});
+        .WhenPressed(frc2::InstantCommand{[this] { m_turret.RunTurretCCW(); },
+                                          {&m_Drive}})
+        .WhenReleased(frc2::InstantCommand{[this] { m_turret.StopTurret(); },
+                                           {&m_turret}});
 
     frc2::POVButton(&m_MainJoystick, 0)
         .WhenPressed(&m_RunClimberUp)

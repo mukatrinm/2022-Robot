@@ -83,7 +83,7 @@ namespace ClimberConstants {
 
 namespace TurretConstants {
     constexpr int kTurret = 11;
-    constexpr double kTurretSpeed = 1.0;
+    constexpr double kTurretSpeed = 0.55;
     constexpr double kMaxSensorVelocity = 22000;
     constexpr double kMaxSensorAcceleration = 20000;
 

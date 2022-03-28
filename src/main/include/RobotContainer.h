@@ -63,10 +63,10 @@ public:
         frc2::InstantCommand{[this] { m_indexer.FeedCargo(); }, {&m_indexer}},
         frc2::WaitCommand(2_s),
         frc2::InstantCommand{[this] { m_indexer.Stop(); }, {&m_indexer}},
-        frc2::InstantCommand{[this] { m_Drive.MoveSrtaight(1); }, {&m_Drive}},
-        frc2::WaitCommand(1.5_s),
+        frc2::InstantCommand{[this] { m_Drive.MoveSrtaight(2); }, {&m_Drive}},
+        frc2::WaitCommand(2_s),
         frc2::InstantCommand{[this] { m_Drive.DRCDrive(0.0, 0.0, 0.0); }, {&m_Drive}},
-        frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(12230); }, {&m_shooter}),
+        frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(12730); }, {&m_shooter}),
         frc2::WaitCommand(0.5_s),
         frc2::InstantCommand{[this] { m_indexer.FeedCargo(); }, {&m_indexer}},
         frc2::WaitCommand(2.5_s),
@@ -126,6 +126,8 @@ private:
     Climber m_climber;
     Limelight m_limelight;
     Turret m_turret{&m_Drive, &m_limelight};
+    
+    double shooter_speed;
 
     frc::XboxController m_MainJoystick{OI::kMainController};
     frc::XboxController m_SecondaryJoystick{OI::kSecondaryController};

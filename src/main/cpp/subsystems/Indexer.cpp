@@ -22,11 +22,11 @@ void Indexer::RunIndexerBack() {
 }
 
 void Indexer::RunFeeder() {
-    m_FeedingMotor.Set(-1.0);
+    m_FeedingMotor.Set(-0.63);
 }
 
 void Indexer::RunFeederBack() {
-    m_FeedingMotor.Set(1.0);
+    m_FeedingMotor.Set(0.63);
 }
 
 void Indexer::FeedCargo() {

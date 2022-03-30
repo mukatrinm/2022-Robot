@@ -24,20 +24,20 @@ void Limelight::Periodic()
         xOffset = m_limelightTable->GetEntry("tx").GetDouble(0);
         yOffset = m_limelightTable->GetEntry("ty").GetDouble(0);
         distance1 = h / (std::tan(DegreesToRadians(yOffset + theta)) * std::cos(DegreesToRadians(xOffset)));
-        distance2 = CalculateDistanceToTargetMeters(h, 2.61, DegreesToRadians(theta), DegreesToRadians(yOffset));
+        distance2 = CalculateDistanceToTargetMeters(h, 2.59, DegreesToRadians(theta), DegreesToRadians(yOffset));
 
         frc::SmartDashboard::PutNumber("Limelight/Distance Method 1", distance1);
         frc::SmartDashboard::PutNumber("Limelight/Distance Method 2", distance2);
-        frc::SmartDashboard::PutNumber("Limelight/tX", xOffset);
-        frc::SmartDashboard::PutNumber("Limelight/ty", yOffset);
+        // frc::SmartDashboard::PutNumber("Limelight/tX", xOffset);
+        // frc::SmartDashboard::PutNumber("Limelight/ty", yOffset);
         frc::SmartDashboard::PutBoolean("Limelight/Target Found", HasTarget());
-        frc::SmartDashboard::PutBoolean("Limelight/Target Found", IsInRange());
-
+        frc::SmartDashboard::PutBoolean("Limelight/Target In Range", IsInRange());
 
         latency = m_limelightTable->GetEntry("tl").GetDouble(0) / 1000.0 + 0.011;
         // m_state = VisionState{xOffset, distance, frc::Timer::GetFPGATimestamp() - latency};
     } else {
         frc::SmartDashboard::PutBoolean("Limelight/Target Found", HasTarget());
+        frc::SmartDashboard::PutBoolean("Limelight/Target In Range", false);
     }
 }
 
@@ -76,7 +76,7 @@ bool Limelight::HasTarget()
 
 bool Limelight::IsInRange()
 {
-    return (distance2 >=1.2 && distance2 <= 1.4);
+    return (distance2 >=1.81 && distance2 <= 2.25);
 }
 
 void Limelight::TurnOffLEDs()

@@ -17,7 +17,7 @@
 #include <frc2/command/RunCommand.h>
 
 RobotContainer::RobotContainer()
-    : shooter_speed{12330}
+    // : shooter_speed{12330}
 {
     // Initialize all of your commands and subsystems here
 
@@ -31,7 +31,7 @@ RobotContainer::RobotContainer()
     //             0.9 * m_MainJoystick.GetLeftX());
     //     },
     //     {&m_Drive}));
-    frc::SmartDashboard::PutNumber("Shooter/Input Velocity", shooter_speed);
+    // frc::SmartDashboard::PutNumber("Shooter/Input Velocity", shooter_speed);
 }
 
 void RobotContainer::EnableDTDefaultCommand()
@@ -48,28 +48,44 @@ void RobotContainer::EnableDTDefaultCommand()
 
 void RobotContainer::ConfigureButtonBindings()
 {
-    frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kY))
+    frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kA))
         .WhenHeld(frc2::SequentialCommandGroup{
             frc2::InstantCommand{[this] { m_turret.TurnToAngleNotConstraint(-m_limelight.GetTargetAngle()); }, {&m_turret}},
             // frc2::WaitUntilCommand([this] { return m_turret.IsInTargetAngle(); }).WithTimeout(1_s),
-            frc2::WaitCommand(0.5_s),
-            frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(13550); }, {&m_shooter}),
+            frc2::WaitCommand(0.4_s),
+            // frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(13550); }, {&m_shooter})})
             // frc2::WaitUntilCommand([this] { return m_shooter.IsInTargetVel(); }).WithTimeout(1_s),
-            frc2::WaitCommand(2.0_s),
+            // frc2::WaitCommand(1.2_s),
             frc2::InstantCommand([this] { m_indexer.FeedCargo(); }, {&m_indexer})})
-        .WhenReleased(frc2::SequentialCommandGroup{
-            frc2::InstantCommand{[this] { m_shooter.StopShooter(); }},
-            frc2::InstantCommand{[this] { m_indexer.Stop(); }}});
+        .WhenReleased(
+            frc2::InstantCommand{[this] { m_indexer.Stop(); }, {&m_indexer}});
 
-    frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kA))
-        .WhenHeld(frc2::SequentialCommandGroup{
-            frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(10290); }, {&m_shooter}),
-            // frc2::WaitUntilCommand([this] { return m_shooter.IsInTargetVel(); }).WithTimeout(1_s),
-            frc2::WaitCommand(0.5_s),
-            frc2::InstantCommand([this] { m_indexer.FeedCargo(); }, {&m_indexer})})
-        .WhenReleased(frc2::SequentialCommandGroup{
-            frc2::InstantCommand{[this] { m_shooter.StopShooter(); }},
-            frc2::InstantCommand{[this] { m_indexer.Stop(); }}});
+    // frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kY))
+    //     .WhenHeld(frc2::SequentialCommandGroup{
+    //         frc2::InstantCommand{[this] { m_turret.TurnToAngleNotConstraint(-m_limelight.GetTargetAngle()); }, {&m_turret}},
+    //         // frc2::WaitUntilCommand([this] { return m_turret.IsInTargetAngle(); }).WithTimeout(1_s),
+    //         // frc2::WaitCommand(0.5_s),
+    //         frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(10290); }, {&m_shooter})})
+    //         // frc2::WaitUntilCommand([this] { return m_shooter.IsInTargetVel(); }).WithTimeout(1_s),
+    //         // frc2::WaitCommand(0.5_s),
+    //         // frc2::InstantCommand([this] { m_indexer.FeedCargo(); }, {&m_indexer})})
+    //     .WhenReleased(
+    //         frc2::InstantCommand{[this] { m_shooter.StopShooter(); }});
+    //         // frc2::InstantCommand{[this] { m_indexer.Stop(); }}});
+
+
+    frc2::JoystickButton(&m_SecondaryJoystick, static_cast<int>(frc::XboxController::Button::kX))
+        .WhenPressed(frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(10310); }, {&m_shooter}));
+
+    frc2::JoystickButton(&m_SecondaryJoystick, static_cast<int>(frc::XboxController::Button::kY))
+        .WhenPressed(frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(13550); }, {&m_shooter}));
+    
+    frc2::JoystickButton(&m_SecondaryJoystick, static_cast<int>(frc::XboxController::Button::kA))
+        .WhenPressed(frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(9210); }, {&m_shooter}));
+
+    frc2::JoystickButton(&m_SecondaryJoystick, static_cast<int>(frc::XboxController::Button::kB))
+        .WhenPressed(frc2::InstantCommand{[this] { m_shooter.StopShooter(); }, {&m_shooter}});
+
 
     frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kX))
         .WhenPressed(&m_RunIntake);

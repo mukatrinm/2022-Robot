@@ -30,11 +30,11 @@ void Turret::Periodic()
     OutputToDashboard();
 
     // calc max velocity
-    double turrVel = m_turretMotor.GetSelectedSensorVelocity();
-    if (maxVel < std::abs(turrVel)) {
-        maxVel = std::abs(turrVel);
-        frc::SmartDashboard::PutNumber("Turret/Max Velocity-2", maxVel);
-    }
+    // double turrVel = m_turretMotor.GetSelectedSensorVelocity();
+    // if (maxVel < std::abs(turrVel)) {
+    //     maxVel = std::abs(turrVel);
+    //     frc::SmartDashboard::PutNumber("Turret/Max Velocity-2", maxVel);
+    // }
 
     m_currentAngle = m_turretMotor.GetSelectedSensorPosition() / TurretConstants::kTicksPerAngle;
 }
@@ -153,8 +153,8 @@ void Turret::StopTurret()
 
 void Turret::OutputToDashboard()
 {
-    frc::SmartDashboard::PutNumber("Turret/TurretSensorVel-2", m_turretMotor.GetSelectedSensorVelocity());
-    frc::SmartDashboard::PutNumber("Turret/TurretSensorPos-2", m_turretMotor.GetSelectedSensorPosition());
+    // frc::SmartDashboard::PutNumber("Turret/TurretSensorVel-2", m_turretMotor.GetSelectedSensorVelocity());
+    // frc::SmartDashboard::PutNumber("Turret/TurretSensorPos-2", m_turretMotor.GetSelectedSensorPosition());
     // frc::SmartDashboard::PutNumber("Turret MotorOutputPercent", m_turretMotor.GetMotorOutputPercent());
     frc::SmartDashboard::PutNumber("Turret/ClosedLoopError", m_turretMotor.GetClosedLoopError());
 

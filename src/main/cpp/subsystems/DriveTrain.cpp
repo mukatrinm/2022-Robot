@@ -114,13 +114,13 @@ void DriveTrain::Periodic()
 
 void DriveTrain::OutputData()
 {
-    frc::SmartDashboard::PutNumber("DT/RightPosition", m_RightMotorMain.GetSelectedSensorPosition());
-    frc::SmartDashboard::PutNumber("DT/RightVelocity", m_RightMotorMain.GetSelectedSensorVelocity());
-    frc::SmartDashboard::PutNumber("DT/Right error", m_RightMotorMain.GetClosedLoopError());
+    // frc::SmartDashboard::PutNumber("DT/RightPosition", m_RightMotorMain.GetSelectedSensorPosition());
+    // frc::SmartDashboard::PutNumber("DT/RightVelocity", m_RightMotorMain.GetSelectedSensorVelocity());
+    // frc::SmartDashboard::PutNumber("DT/Right error", m_RightMotorMain.GetClosedLoopError());
 
-    frc::SmartDashboard::PutNumber("DT/LeftPosition", m_LeftMotorMain.GetSelectedSensorPosition());
-    frc::SmartDashboard::PutNumber("DT/LeftVelocity", m_LeftMotorMain.GetSelectedSensorVelocity());
-    frc::SmartDashboard::PutNumber("DT/Left error", m_LeftMotorMain.GetClosedLoopError());
+    // frc::SmartDashboard::PutNumber("DT/LeftPosition", m_LeftMotorMain.GetSelectedSensorPosition());
+    // frc::SmartDashboard::PutNumber("DT/LeftVelocity", m_LeftMotorMain.GetSelectedSensorVelocity());
+    // frc::SmartDashboard::PutNumber("DT/Left error", m_LeftMotorMain.GetClosedLoopError());
 }
 
 void DriveTrain::ArcadeDrive(double fwd)

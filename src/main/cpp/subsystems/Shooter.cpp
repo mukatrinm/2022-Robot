@@ -62,8 +62,8 @@ void Shooter::Periodic()
 void Shooter::OutputData()
 {
     frc::SmartDashboard::PutNumber("Shooter/Velocity", GetShooterVelocity());
-    frc::SmartDashboard::PutNumber("Shooter/Velocity", m_ShooterMotor.GetClosedLoopError());
-    frc::SmartDashboard::PutNumber("Shooter/RPM", (m_ShooterMotor.GetSelectedSensorVelocity(0) * 600) / ShooterConstants::kCountsPerRev);
+    frc::SmartDashboard::PutNumber("Shooter/Velocity  Error", m_ShooterMotor.GetClosedLoopError());
+    // frc::SmartDashboard::PutNumber("Shooter/RPM", (m_ShooterMotor.GetSelectedSensorVelocity(0) * 600) / ShooterConstants::kCountsPerRev);
     frc::SmartDashboard::PutNumber("Shooter/Target Velocity", m_targetVelocity);
     // frc::SmartDashboard::PutNumber("Hood/m_HoodMotorSensorPos", m_HoodMotor.GetSelectedSensorPosition(0));
     // frc::SmartDashboard::PutNumber("Hood/Target Angle", m_reference);

@@ -7,7 +7,9 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
 
-void Robot::RobotInit() {}
+void Robot::RobotInit() {
+  
+}
 
 /**
  * This function is called every 20 ms, no matter the mode. Use
@@ -29,18 +31,23 @@ void Robot::RobotPeriodic() {
 void Robot::DisabledInit() {
   m_container.GetTurret()->EnableCoastMode();
   m_container.GetDriveTrain()->TurnOnCoastMode();
+  m_container.m_StopAll.Schedule();
 }
 
-void Robot::DisabledPeriodic() {}
+void Robot::DisabledPeriodic() {
+
+}
 
 /**
  * This autonomous runs the autonomous command selected by your {@link
  * RobotContainer} class.
  */
 void Robot::AutonomousInit() {
+  m_container.GetDriveTrain()->ResetEncoders();
+  m_container.GetDriveTrain()->ResetGyro();
   m_container.GetDriveTrain()->TurnOnBrakeMode();
   m_container.GetTurret()->EnableBrakeMode();
-    m_autonomousCommand = m_container.GetAutonomousCommand();
+  m_autonomousCommand = m_container.GetAutonomousCommand();
 
   if (m_autonomousCommand != nullptr) {
     m_autonomousCommand->Schedule();
@@ -50,8 +57,10 @@ void Robot::AutonomousInit() {
 void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
+  m_container.GetDriveTrain()->ResetEncoders();
   m_container.GetTurret()->EnableBrakeMode();
   m_container.GetDriveTrain()->TurnOnBrakeMode();
+
   // This makes sure that the autonomous stops running when
   // teleop starts running. If you want the autonomous to
   // continue until interrupted by another command, remove

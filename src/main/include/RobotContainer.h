@@ -19,11 +19,15 @@
 #include "subsystems/Limelight.h"
 #include "subsystems/Shooter.h"
 #include "subsystems/Turret.h"
+#include "Commands/TurnTurret.h"
 
 #include <frc/XboxController.h>
 
 #include <frc2/command/button/JoystickButton.h>
 #include <frc2/command/button/POVButton.h>
+
+#include <frc/smartdashboard/SendableChooser.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 class RobotContainer
 {
@@ -31,6 +35,8 @@ public:
     RobotContainer();
 
     frc2::Command *GetAutonomousCommand();
+    frc2::Command *RightPath();
+    frc2::Command *MiddlePath();
 
     // frc2::SequentialCommandGroup m_ShootUpperHub{
     //   frc2::InstantCommand{[this]{m_shooter.SetShooterVelocity(12290);}},
@@ -63,7 +69,7 @@ public:
         frc2::InstantCommand{[this] { m_indexer.FeedCargo(); }, {&m_indexer}},
         frc2::WaitCommand(2_s),
         frc2::InstantCommand{[this] { m_indexer.Stop(); }, {&m_indexer}},
-        frc2::InstantCommand{[this] { m_Drive.MoveSrtaight(1.7); }, {&m_Drive}},
+        frc2::InstantCommand{[this] { m_Drive.MoveStraight(1.7); }, {&m_Drive}},
         frc2::WaitCommand(2_s),
         frc2::InstantCommand{[this] { m_Drive.DRCDrive(0.0, 0.0, 0.0); }, {&m_Drive}},
         frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(12730); }, {&m_shooter}),
@@ -74,6 +80,14 @@ public:
         frc2::InstantCommand{[this] { m_indexer.Stop(); }},
     };
 
+    frc2::SequentialCommandGroup m_StopAll{
+        frc2::InstantCommand{[this] { m_shooter.StopShooter(); }},
+        frc2::InstantCommand{[this] { m_indexer.Stop(); }},
+        frc2::InstantCommand{[this] { m_Drive.DRCDrive(0, 0.0, 0);}},
+        frc2::InstantCommand{[this] { m_intake.StopIntake();}},
+        frc2::InstantCommand{[this] { m_climber.StopClimber();}},
+        frc2::InstantCommand{[this] { m_turret.StopTurret();}, {&m_turret}},
+        frc2::InstantCommand{[this] { m_Drive.DRCDrive(0, 0.0, 0);}}};
     // frc2::SequentialCommandGroup Auto{
     //   // frc2::InstantCommand{[this] { m_shooter.RunShooter(0.28); }},
     //     frc2::InstantCommand{[this] { m_Drive.MoveSrtaight(1);}, {&m_Drive}}
@@ -107,6 +121,8 @@ public:
     frc2::InstantCommand m_moveB{[this] { m_Drive.DRCDrive(0, 0.5, 0); }, {}};
     frc2::InstantCommand m_StopDriveTrain{[this] { m_Drive.DRCDrive(0, 0.0, 0); }, {}};
 
+    
+
     static RobotContainer *getInstance();
     DriveTrain *GetDriveTrain();
     Shooter *GetShooter();
@@ -127,8 +143,13 @@ private:
     Limelight m_limelight;
     Turret m_turret{&m_Drive, &m_limelight};
     
+    TurnTurret TurnTurret90;
+    
     double shooter_speed;
 
+    frc::DifferentialDriveKinematics kDriveKinematics{DriveTrainContsants::kTrackwidth};
     frc::XboxController m_MainJoystick{OI::kMainController};
     frc::XboxController m_SecondaryJoystick{OI::kSecondaryController};
+
+    frc::SendableChooser<frc2::Command*> m_chooser;
 };

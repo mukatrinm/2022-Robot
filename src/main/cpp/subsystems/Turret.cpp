@@ -51,6 +51,10 @@ double Turret::ConstrainToAcceptableRange(double angle)
     return goal;
 }
 
+double Turret::GetAngle(){
+    return m_turretMotor.GetSelectedSensorPosition() / TurretConstants::kTicksPerAngle;
+}
+
 double Turret::GetTargetAngle()
 {
     return m_target;

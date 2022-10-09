@@ -8,10 +8,14 @@
 #include "Constants.h"
 #include <ctre/Phoenix.h>
 #include <frc/Compressor.h>
+#include <frc/Encoder.h>
 #include <frc/DoubleSolenoid.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc2/command/SubsystemBase.h>
+#include <frc/geometry/Pose2d.h>
+#include <frc/kinematics/DifferentialDriveOdometry.h>
+#include <units/voltage.h>
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <networktables/NetworkTableEntry.h>
@@ -42,13 +46,34 @@ public:
     void SwitchHighGear(); // Slower Speed
     void SwitchLowGear();  // Faster Speed
 
+    double GetAverageEncoderDistance();
+
+    double GetRightEncoderDistance();
+    double GetLeftEncoderDistance();
+
     void ArcadeDrive(double fwd);
 
-    void MoveSrtaight(double distance);
+    void MoveStraight(double distance);
 
-    double SetMaxOutput();
+    void SetMaxOutput(double maxOutput);
     void FeedTalons();
     void ResetEncoders();
+    void ResetGyro();
+
+    frc::Pose2d GetPose();
+
+    double GetTurnRate();
+
+    units::degree_t GetHeading() const ;
+
+    void ResetOdometry(frc::Pose2d pose);
+
+    frc::DifferentialDriveWheelSpeeds GetWheelSpeeds();
+
+    void TankDriveVolts(units::volt_t left, units::volt_t right);
+
+    double GetLeftEncoderSpeed();
+    double GetRightEncoderSpeed();
 
 private:
     WPI_TalonFX m_RightMotorMain;
@@ -71,4 +96,9 @@ private:
     // nt::NetworkTableEntry leftMeas;// = table -> GetEntry("left_measurement");
     // nt::NetworkTableEntry rightRef;// = table -> GetEntry("right_reference");
     // nt::NetworkTableEntry rightMeas;// = table -> GetEntry("right_measurement");
+
+    AHRS *m_gyro = nullptr;
+
+    frc::DifferentialDriveOdometry m_odometry;
+
 };

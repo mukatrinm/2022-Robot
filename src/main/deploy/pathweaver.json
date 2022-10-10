@@ -1,9 +1,9 @@
 {
   "lengthUnit": "Meter",
   "exportUnit": "Always Meters",
-  "maxVelocity": 3.0,
+  "maxVelocity": 4.0,
   "maxAcceleration": 2.5,
   "trackWidth": 0.625,
   "gameName": "Rapid React",
-  "outputDir": ""
+  "outputDir": "../../../../2022-Robot/src/main/deploy"
 }

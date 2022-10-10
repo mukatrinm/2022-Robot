@@ -35,8 +35,9 @@ public:
     RobotContainer();
 
     frc2::Command *GetAutonomousCommand();
-    frc2::Command *RightPath();
+    frc2::Command *LeftPath();
     frc2::Command *MiddlePath();
+    frc2::Command *RightPath();
 
     // frc2::SequentialCommandGroup m_ShootUpperHub{
     //   frc2::InstantCommand{[this]{m_shooter.SetShooterVelocity(12290);}},
@@ -143,6 +144,7 @@ private:
     Limelight m_limelight;
     Turret m_turret{&m_Drive, &m_limelight};
     
+    TurnTurret TurnTurret70;
     TurnTurret TurnTurret90;
     
     double shooter_speed;

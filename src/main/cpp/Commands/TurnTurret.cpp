@@ -15,6 +15,7 @@ void TurnTurret::Execute(){
 }
 
 bool TurnTurret::IsFinished(){
+    std::cout << abs(m_Turret->GetAngle() - m_Target) << std::endl;
     return abs(m_Turret->GetAngle() - m_Target)<2;
 }
 

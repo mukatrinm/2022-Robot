@@ -29,7 +29,9 @@
 #include <frc2/command/RunCommand.h>
 
 RobotContainer::RobotContainer()
-: TurnTurret90{&m_turret, 90}
+: TurnTurret70{&m_turret, 70},
+  TurnTurret90{&m_turret, 90}
+
     // : shooter_speed{12330}
 {
     // Initialize all of your commands and subsystems here
@@ -47,7 +49,7 @@ RobotContainer::RobotContainer()
     // frc::SmartDashboard::PutNumber("Shooter/Input Velocity", shooter_speed);
 
     m_chooser.SetDefaultOption("null", nullptr);
-    m_chooser.AddOption("RightPath", RightPath());
+    m_chooser.AddOption("LeftPath", LeftPath());
     m_chooser.AddOption("MiddlePath", MiddlePath());
 
     frc::SmartDashboard::PutData(&m_chooser);
@@ -70,9 +72,10 @@ void RobotContainer::ConfigureButtonBindings()
     frc2::JoystickButton(&m_MainJoystick, static_cast<int>(frc::XboxController::Button::kA))
         .WhenHeld(frc2::SequentialCommandGroup{
             frc2::InstantCommand{[this] { m_turret.TurnToAngleNotConstraint(-m_limelight.GetTargetAngle()); }, {&m_turret}},
-            // frc2::WaitUntilCommand([this] { return m_turret.IsInTargetAngle(); }).WithTimeout(1_s),
+            frc2::WaitUntilCommand([this] { return m_turret.IsInTargetAngle(); }).WithTimeout(1_s),
             frc2::WaitCommand(0.4_s),
-            // frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(13550); }, {&m_shooter})})
+            frc2::InstantCommand([this] { m_shooter.SetShooterVelocity(10500); }, {&m_shooter}),
+            frc2::WaitCommand(0.2_s),
             // frc2::WaitUntilCommand([this] { return m_shooter.IsInTargetVel(); }).WithTimeout(1_s),
             // frc2::WaitCommand(1.2_s),
             frc2::InstantCommand([this] { m_indexer.FeedCargo(); }, {&m_indexer})})
@@ -153,10 +156,10 @@ void RobotContainer::ConfigureButtonBindings()
         .WhenPressed(&m_switchLowGear);
 }
 frc2::Command* RobotContainer::GetAutonomousCommand(){
-    return MiddlePath();
+    return RightPath();
 }
 
-frc2::Command* RobotContainer::RightPath() {
+frc2::Command* RobotContainer::LeftPath() {
 
   // Create a voltage constraint to ensure we don't accelerate too fast
   frc::DifferentialDriveVoltageConstraint autoVoltageConstraint(
@@ -349,6 +352,180 @@ frc2::Command* RobotContainer::MiddlePath() {
         frc2::WaitCommand(3_s),
         frc2::InstantCommand([this] { m_indexer.Stop(); }, {})
 );
+}
+frc2::Command* RobotContainer::RightPath() {
+
+  // Create a voltage constraint to ensure we don't accelerate too fast
+  frc::DifferentialDriveVoltageConstraint autoVoltageConstraint(
+      frc::SimpleMotorFeedforward<units::meters>(
+          DriveTrainContsants::ks, DriveTrainContsants::kv, DriveTrainContsants::ka),
+      RobotContainer::kDriveKinematics, 10_V);
+
+  // Set up config for trajectory
+  frc::TrajectoryConfig config(DriveTrainContsants::kMaxSpeed,
+                               DriveTrainContsants::kMaxAcceleration);
+  // Add kinematics to ensure max speed is actually obeyed
+  config.SetKinematics(RobotContainer::kDriveKinematics);
+  // Apply the voltage constraint
+  config.AddConstraint(autoVoltageConstraint);
+
+
+  // An example trajectory to follow.  All units in meters.
+  
+  fs::path deployDirectory = frc::filesystem::GetDeployDirectory();
+    deployDirectory = deployDirectory / "output" / "Path5.wpilib.json";
+    frc::Trajectory trajectory1 = frc::TrajectoryUtil::FromPathweaverJson(deployDirectory.string());
+    deployDirectory = frc::filesystem::GetDeployDirectory();
+    deployDirectory = deployDirectory / "output" / "Path6.wpilib.json";
+    frc::Trajectory trajectory2 = frc::TrajectoryUtil::FromPathweaverJson(deployDirectory.string());
+    deployDirectory = frc::filesystem::GetDeployDirectory();
+    deployDirectory = deployDirectory / "output" / "Path7.wpilib.json";
+    frc::Trajectory trajectory3 = frc::TrajectoryUtil::FromPathweaverJson(deployDirectory.string());
+    deployDirectory = frc::filesystem::GetDeployDirectory();
+    deployDirectory = deployDirectory / "output" / "Path8.wpilib.json";
+    frc::Trajectory trajectory4 = frc::TrajectoryUtil::FromPathweaverJson(deployDirectory.string());
+    deployDirectory = frc::filesystem::GetDeployDirectory();
+    deployDirectory = deployDirectory / "output" / "Path9.wpilib.json";
+    frc::Trajectory trajectory5 = frc::TrajectoryUtil::FromPathweaverJson(deployDirectory.string());
+    deployDirectory = frc::filesystem::GetDeployDirectory();
+    deployDirectory = deployDirectory / "output" / "Path10.wpilib.json";
+    frc::Trajectory trajectory6 = frc::TrajectoryUtil::FromPathweaverJson(deployDirectory.string());
+//   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
+//       // Start at the origin facing the +X direction
+//       frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg)),
+//       // Pass through these two interior waypoints, making an 's' curve path
+//       {frc::Translation2d(2_m,2_m),frc::Translation2d(4_m,0_m)},
+//       // End 3 meters straight ahead of where we started, facing forward
+//       frc::Pose2d(6_m, 2_m, frc::Rotation2d(0_deg)),
+//       // Pass the config
+//       config);
+    
+
+  frc2::RamseteCommand ramseteCommand1(
+      trajectory1, [this]() { return m_Drive.GetPose(); },
+      frc::RamseteController(DriveTrainContsants::kRamseteB,
+                             DriveTrainContsants::kRamseteZeta),
+      frc::SimpleMotorFeedforward<units::meters>(
+          DriveTrainContsants::ks, DriveTrainContsants::kv, DriveTrainContsants::ka),
+      RobotContainer::kDriveKinematics,
+      [this] { return m_Drive.GetWheelSpeeds(); },
+      frc2::PIDController(DriveTrainContsants::kP, DriveTrainContsants::kI, DriveTrainContsants::kD),
+      frc2::PIDController(DriveTrainContsants::kP, DriveTrainContsants::kI, DriveTrainContsants::kD),
+      [this](auto left, auto right) { m_Drive.TankDriveVolts(left, right); },
+      {&m_Drive});
+
+  // Reset odometry to the starting pose of the trajectory.
+
+  frc2::RamseteCommand ramseteCommand2(
+      trajectory2, [this]() { return m_Drive.GetPose(); },
+      frc::RamseteController(DriveTrainContsants::kRamseteB,
+                             DriveTrainContsants::kRamseteZeta),
+      frc::SimpleMotorFeedforward<units::meters>(
+          DriveTrainContsants::ks, DriveTrainContsants::kv, DriveTrainContsants::ka),
+      RobotContainer::kDriveKinematics,
+      [this] { return m_Drive.GetWheelSpeeds(); },
+      frc2::PIDController(DriveTrainContsants::kP, DriveTrainContsants::kI, DriveTrainContsants::kD),
+      frc2::PIDController(DriveTrainContsants::kP, DriveTrainContsants::kI, DriveTrainContsants::kD),
+      [this](auto left, auto right) { m_Drive.TankDriveVolts(left, right); },
+      {&m_Drive});
+
+      frc2::RamseteCommand ramseteCommand3(
+      trajectory3, [this]() { return m_Drive.GetPose(); },
+      frc::RamseteController(DriveTrainContsants::kRamseteB,
+                             DriveTrainContsants::kRamseteZeta),
+      frc::SimpleMotorFeedforward<units::meters>(
+          DriveTrainContsants::ks, DriveTrainContsants::kv, DriveTrainContsants::ka),
+      RobotContainer::kDriveKinematics,
+      [this] { return m_Drive.GetWheelSpeeds(); },
+      frc2::PIDController(DriveTrainContsants::kP, DriveTrainContsants::kI, DriveTrainContsants::kD),
+      frc2::PIDController(DriveTrainContsants::kP, DriveTrainContsants::kI, DriveTrainContsants::kD),
+      [this](auto left, auto right) { m_Drive.TankDriveVolts(left, right); },
+      {&m_Drive});
+
+      frc2::RamseteCommand ramseteCommand4(
+      trajectory4, [this]() { return m_Drive.GetPose(); },
+      frc::RamseteController(DriveTrainContsants::kRamseteB,
+                             DriveTrainContsants::kRamseteZeta),
+      frc::SimpleMotorFeedforward<units::meters>(
+          DriveTrainContsants::ks, DriveTrainContsants::kv, DriveTrainContsants::ka),
+      RobotContainer::kDriveKinematics,
+      [this] { return m_Drive.GetWheelSpeeds(); },
+      frc2::PIDController(DriveTrainContsants::kP, DriveTrainContsants::kI, DriveTrainContsants::kD),
+      frc2::PIDController(DriveTrainContsants::kP, DriveTrainContsants::kI, DriveTrainContsants::kD),
+      [this](auto left, auto right) { m_Drive.TankDriveVolts(left, right); },
+      {&m_Drive});
+
+      frc2::RamseteCommand ramseteCommand5(
+      trajectory5, [this]() { return m_Drive.GetPose(); },
+      frc::RamseteController(DriveTrainContsants::kRamseteB,
+                             DriveTrainContsants::kRamseteZeta),
+      frc::SimpleMotorFeedforward<units::meters>(
+          DriveTrainContsants::ks, DriveTrainContsants::kv, DriveTrainContsants::ka),
+      RobotContainer::kDriveKinematics,
+      [this] { return m_Drive.GetWheelSpeeds(); },
+      frc2::PIDController(DriveTrainContsants::kP, DriveTrainContsants::kI, DriveTrainContsants::kD),
+      frc2::PIDController(DriveTrainContsants::kP, DriveTrainContsants::kI, DriveTrainContsants::kD),
+      [this](auto left, auto right) { m_Drive.TankDriveVolts(left, right); },
+      {&m_Drive});
+
+      frc2::RamseteCommand ramseteCommand6(
+      trajectory6, [this]() { return m_Drive.GetPose(); },
+      frc::RamseteController(DriveTrainContsants::kRamseteB,
+                             DriveTrainContsants::kRamseteZeta),
+      frc::SimpleMotorFeedforward<units::meters>(
+          DriveTrainContsants::ks, DriveTrainContsants::kv, DriveTrainContsants::ka),
+      RobotContainer::kDriveKinematics,
+      [this] { return m_Drive.GetWheelSpeeds(); },
+      frc2::PIDController(DriveTrainContsants::kP, DriveTrainContsants::kI, DriveTrainContsants::kD),
+      frc2::PIDController(DriveTrainContsants::kP, DriveTrainContsants::kI, DriveTrainContsants::kD),
+      [this](auto left, auto right) { m_Drive.TankDriveVolts(left, right); },
+      {&m_Drive});
+
+  // Reset odometry to the starting pose of the trajectory.
+  m_Drive.ResetOdometry(trajectory1.InitialPose());
+    
+
+  // no auto
+    return new frc2::SequentialCommandGroup(
+        TurnTurret70,
+        frc2::SequentialCommandGroup {
+            frc2::InstantCommand{[this] { m_shooter.SetShooterVelocity(9290); }},
+            frc2::WaitCommand(0.1_s),
+            frc2::InstantCommand{[this] { m_indexer.FeedCargo(); }}},
+        frc2::InstantCommand{[this] { m_intake.IntakeDown(); }},
+        frc2::WaitCommand(1.5_s),
+        frc2::InstantCommand([this] { m_indexer.Stop(); }, {}),
+        frc2::ParallelCommandGroup {
+            frc2::InstantCommand{[this] { m_intake.RunIntake(); }},
+            frc2::InstantCommand{[this] { m_indexer.RunIndexer(); }}},
+        std::move(ramseteCommand1),
+        frc2::InstantCommand([this] { m_Drive.TankDriveVolts(0_V, 0_V); }, {&m_Drive}),
+        std::move(ramseteCommand2),
+        frc2::InstantCommand([this] { m_Drive.TankDriveVolts(0_V, 0_V); }, {&m_Drive}),
+        std::move(ramseteCommand3),
+        frc2::InstantCommand([this] { m_Drive.TankDriveVolts(0_V, 0_V); }, {&m_Drive}),
+        std::move(ramseteCommand4),
+        frc2::InstantCommand([this] { m_Drive.TankDriveVolts(0_V, 0_V); }, {&m_Drive}),
+        frc2::InstantCommand{[this] { m_turret.TurnToAngleNotConstraint(-m_limelight.GetTargetAngle()); }, {&m_turret}},
+        frc2::WaitUntilCommand([this] { return m_turret.IsInTargetAngle(); }).WithTimeout(1_s),
+        frc2::InstantCommand{[this] { m_indexer.FeedCargo(); }},
+        frc2::WaitCommand(1.5_s),
+        frc2::SequentialCommandGroup {
+            std::move(ramseteCommand5),
+            frc2::WaitCommand(0.3_s),
+            frc2::InstantCommand([this] { m_indexer.Stop(); }, {})},
+        frc2::InstantCommand([this] { m_Drive.TankDriveVolts(0_V, 0_V); }, {&m_Drive}),
+        frc2::WaitCommand(0.6_s),
+        frc2::ParallelCommandGroup {
+            frc2::InstantCommand{[this] { m_intake.IntakeUp(); }},
+            frc2::InstantCommand{[this] { m_intake.StopIntake(); }},
+            frc2::InstantCommand{[this] { m_indexer.Stop(); }}},
+        std::move(ramseteCommand6),
+        frc2::InstantCommand([this] { m_Drive.TankDriveVolts(0_V, 0_V); }, {&m_Drive}),
+        frc2::InstantCommand{[this] { m_indexer.FeedCargo(); }},
+        frc2::WaitCommand(1.5_s),
+        frc2::InstantCommand([this] { m_indexer.Stop(); }, {})
+    );
 }
 
 RobotContainer *RobotContainer::getInstance()
